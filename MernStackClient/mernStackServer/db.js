@@ -1,6 +1,7 @@
-const mongoose= require('mongoose');
+const mongoose = require('mongoose');
 
-const uri = "mongodb+srv://mernApp:S5EfzkW8s6hypxIS@cluster0.xioaigc.mongodb.net/";
+// Update the URI to point to your new local MongoDB database
+const uri = "mongodb://127.0.0.1:27017/mernApp";
 
 const connectToDatabase = async () => {
   try {
@@ -9,21 +10,25 @@ const connectToDatabase = async () => {
       useUnifiedTopology: true,
       dbName: 'mernApp'
     });
-    
+
     console.log("Connected to MongoDB!");
-    const fetched_data = mongoose.connection.db.collection("sample")
-    fetched_data.find({}).toArray(function(err,data){
-        if(err) console.log(err)
-        else console.log(data)
-    })
-    
+
+    // Fetch data from 'food_items' collection
+    const foodItemsCollection = mongoose.connection.db.collection("food_items");
+    const foodItemsData = await foodItemsCollection.find({}).toArray();
+
+    // Fetch data from 'foodCategory' collection
+    const foodCategoryCollection = mongoose.connection.db.collection("foodCategory");
+    const foodCategoryData = await foodCategoryCollection.find({}).toArray();
+
+    // Assign fetched data to global variables
+    global.food_items = foodItemsData;
+    global.foodCategory = foodCategoryData;
+
     return mongoose.connection;
   } catch (err) {
     console.error('Error connecting to MongoDB:', err);
     throw err;
   }
 };
-
-
-
 module.exports = connectToDatabase;

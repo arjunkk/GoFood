@@ -1,34 +1,33 @@
-const express = require('express');
-const mongoDB = require('./db');
-const app = express();
-const port = 4000;
+global.foodData = require('./db')(function call(err, data, CatData) {
+  // console.log(data)
+  if(err) console.log(err);
+  global.foodData = data;
+  global.foodCategory = CatData;
+})
+
 const cors = require('cors');
 
+const express = require('express')
+const app = express()
+// Allow all origins for development (configure it more securely for production)
 app.use(cors());
-
-app.use((req,res,next)=>{
-  res.setHeader("Access-Control-Allow-Origin","http://localhost:3000");
+const port = 4000
+app.use((req, res, next) => {
+  res.setHeader("Access-Control-Allow-Origin", "http://localhost:3000");
   res.header(
     "Access-Control-Allow-Headers",
-    "Origin, X-Requested-With,Content-Type ,Accept"
-  )
+    "Origin, X-Requested-With, Content-Type, Accept"
+  );
   next();
-})
-app.use(express.json()); 
-
-mongoDB().then(() => {
-  app.use("/", require('./Routes/CreateUser'));
-
-  app.get('/', (req, res) => {
-    res.send("hello");
-  });
-
-
-
-
-  app.listen(port, () => {
-    console.log(`Listening on port ${port}`);
-  });
-}).catch((err) => {
-  console.error('Error connecting to MongoDB:', err);
 });
+app.use(express.json())
+
+app.get('/', (req, res) => {
+  res.send('Hello World!')
+})
+
+app.use('/api/auth', require('./Routes/Auth'));
+
+app.listen(port, () => {
+  console.log(`Example app listening on http://localhost:${port}`)
+})
